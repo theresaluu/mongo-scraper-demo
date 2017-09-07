@@ -4,7 +4,7 @@
   "description": "Search and fav TED talks",
   "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
