@@ -3,28 +3,25 @@ var bodyParser = require("body-parser");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 
-var Talk = require("./server/model");
+var Article = require("./server/model");
 
 let app = express();
 let PORT = process.env.PORT || 3000;
 
 app.use(logger("dev"));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 app.use(bodyParser.json({ type: "application/vnd.api+json" }));
 
 app.use(express.static("public"));
 
 //-------------------------MongoDB config ------------------------------------
-const databaseUri = "mongodb://localhost/heroku_pg676kmk"
+const databaseUri = "mongodb://heroku_xh448km8:kd9qaeo7etfalohdacvalv96uj@ds161713.mlab.com:61713/heroku_xh448km8"
 
-if (process.env.MONGODB_URI) {
-  mongoose.connect(process.env.MONGO_URI);
-} else {
-  mongoose.connect(databaseUri);
-}
+mongoose.connect(databaseUri);
 
-let db = mongoose.connection;
+var db = mongoose.connection;
 
 db.on("error", function(err) {
   console.log("Mongoose Error: ", err);
@@ -34,10 +31,9 @@ db.once("open", function() {
   console.log("Mongoose connection successful.");
 });
 
-// Route to get all saved talks
 app.get("/api/saved", function(req, res) {
 
-  Talk.find({})
+  Article.find({})
     .exec(function(err, doc) {
 
       if (err) {
@@ -49,13 +45,12 @@ app.get("/api/saved", function(req, res) {
     });
 });
 
-// Route to add a talk to saved list
 app.post("/api/saved", function(req, res) {
-  var newTalk = new Talk(req.body);
+  var newArticle = new Article(req.body);
 
   console.log(req.body);
 
-  newTalk.save(function(err, doc) {
+  newArticle.save(function(err, doc) {
     if (err) {
       console.log(err);
     }
@@ -65,12 +60,11 @@ app.post("/api/saved", function(req, res) {
   });
 });
 
-// Route to delete a talk from saved list
 app.delete("/api/saved/", function(req, res) {
 
   var url = req.param("url");
 
-  Talk.find({ url: url }).remove().exec(function(err) {
+  Artlcle.find({ url: url }).remove().exec(function(err) {
     if (err) {
       console.log(err);
     }
@@ -80,7 +74,6 @@ app.delete("/api/saved/", function(req, res) {
   });
 });
 
-// Any non API GET routes will be directed to our React App and handled by React Router
 app.get("*", function(req, res) {
   res.sendFile(__dirname + "/public/index.html");
 });
